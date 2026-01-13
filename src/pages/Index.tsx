@@ -1,20 +1,36 @@
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BannerCarousel from '@/components/BannerCarousel';
 import CategoryGrid from '@/components/CategoryGrid';
 import ProductSection from '@/components/ProductSection';
-import { products } from '@/data/products';
+import { fetchProducts } from '@/api/client';
+import { Product } from '@/data/products';
 
 const Index = () => {
-  const featuredProducts = products.slice(0, 6);
-  const flashSaleProducts = products.filter(p => p.discountPercentage >= 30).slice(0, 6);
-  const electronicsProducts = products.filter(p => p.category === 'electronics').slice(0, 6);
-  const fashionProducts = products.filter(p => p.category === 'fashion').slice(0, 6);
+  const { data: allProducts = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => fetchProducts()
+  });
+
+  // Client-side filtering for now, until we make specific API endpoints for these
+  const featuredProducts = allProducts.slice(0, 6);
+  const flashSaleProducts = allProducts.filter((p: Product) => p.discountPercentage >= 30).slice(0, 6);
+  const electronicsProducts = allProducts.filter((p: Product) => p.category === 'electronics').slice(0, 6);
+  const fashionProducts = allProducts.filter((p: Product) => p.category === 'fashion').slice(0, 6);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       <main>
         {/* Banner Carousel */}
         <BannerCarousel />

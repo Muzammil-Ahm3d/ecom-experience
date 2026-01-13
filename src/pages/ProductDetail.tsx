@@ -1,33 +1,37 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Star, Heart, Share2, ShieldCheck, Truck, RotateCcw, ChevronRight, Minus, Plus, ThumbsUp } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 import { toast } from '@/hooks/use-toast';
+import { fetchProductById } from '@/api/client';
+import { Product } from '@/data/products';
 
 const ProductDetail = () => {
-  const { productId } = useParams();
+  const { productId } = useParams<{ productId: string }>();
   const { addToCart } = useCart();
-
-  const product = useMemo(() => {
-    return products.find(p => p.id === productId);
-  }, [productId]);
-
-  const relatedProducts = useMemo(() => {
-    if (!product) return [];
-    return products
-      .filter(p => p.category === product.category && p.id !== product.id)
-      .slice(0, 4);
-  }, [product]);
-
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
 
-  if (!product) {
+  const { data: product, isLoading, isError } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => fetchProductById(productId!),
+    enabled: !!productId
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (isError || !product) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -70,7 +74,7 @@ const ProductDetail = () => {
     window.location.href = '/cart';
   };
 
-  // Mock reviews
+  // Mock reviews - in real app, fetch from API
   const reviews = [
     {
       id: 1,
@@ -136,13 +140,12 @@ const ProductDetail = () => {
             {/* Thumbnails */}
             {product.images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto">
-                {product.images.map((img, index) => (
+                {product.images.map((img: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`w-20 h-20 flex-shrink-0 rounded-sm overflow-hidden border-2 transition-colors ${
-                      selectedImage === index ? 'border-primary' : 'border-transparent hover:border-primary/50'
-                    }`}
+                    className={`w-20 h-20 flex-shrink-0 rounded-sm overflow-hidden border-2 transition-colors ${selectedImage === index ? 'border-primary' : 'border-transparent hover:border-primary/50'
+                      }`}
                   >
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
@@ -225,19 +228,18 @@ const ProductDetail = () => {
             {/* Variants */}
             {product.variants.length > 0 && (
               <div className="mb-6 space-y-4">
-                {product.variants.map(variant => (
+                {product.variants.map((variant: any) => (
                   <div key={variant.name}>
                     <h3 className="font-semibold mb-2">{variant.name}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {variant.options.map(option => (
+                      {variant.options.map((option: string) => (
                         <button
                           key={option}
                           onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: option }))}
-                          className={`px-4 py-2 border rounded-sm text-sm font-medium transition-colors ${
-                            selectedVariants[variant.name] === option
+                          className={`px-4 py-2 border rounded-sm text-sm font-medium transition-colors ${selectedVariants[variant.name] === option
                               ? 'border-primary bg-primary/5 text-primary'
                               : 'border-border hover:border-primary/50'
-                          }`}
+                            }`}
                         >
                           {option}
                         </button>
@@ -325,13 +327,13 @@ const ProductDetail = () => {
         <section className="bg-card rounded-sm p-6 mt-6">
           <h2 className="text-xl font-bold mb-4">Specifications</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {Object.entries(product.specifications).map(([key, value], index) => (
+            {product.specifications && Object.entries(product.specifications).map(([key, value], index) => (
               <div
                 key={key}
                 className={`flex py-3 ${index % 2 === 0 ? 'bg-muted/50' : ''} px-4 rounded-sm`}
               >
                 <span className="w-40 text-muted-foreground flex-shrink-0">{key}</span>
-                <span className="font-medium">{value}</span>
+                <span className="font-medium">{value as string}</span>
               </div>
             ))}
           </div>
@@ -408,17 +410,6 @@ const ProductDetail = () => {
           </div>
         </section>
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <section className="mt-6">
-            <h2 className="text-xl font-bold mb-4">Similar Products</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </section>
-        )}
       </main>
 
       <Footer />

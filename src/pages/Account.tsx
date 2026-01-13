@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, User, Package, Heart, MapPin, CreditCard, Bell, Settings, LogOut, Edit, Plus, Trash2 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 const sidebarItems = [
   { id: 'profile', label: 'My Profile', icon: User },
@@ -43,15 +44,41 @@ const mockAddresses = [
 ];
 
 const Account = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
+
+  // Split name into first and last
+  const nameParts = user?.name?.split(' ') || ['User'];
+  const firstName = nameParts[0] || 'User';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
   const [profile, setProfile] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '9876543210',
-    gender: 'Male',
+    firstName,
+    lastName,
+    email: user?.email || '',
+    phone: '',
+    gender: '',
   });
+
+  // Update profile when user changes
+  useEffect(() => {
+    if (user) {
+      const parts = user.name?.split(' ') || ['User'];
+      setProfile(p => ({
+        ...p,
+        firstName: parts[0] || 'User',
+        lastName: parts.slice(1).join(' ') || '',
+        email: user.email || '',
+      }));
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
 
   const handleSaveProfile = () => {
     setIsEditing(false);
@@ -346,11 +373,10 @@ const Account = () => {
                     <button
                       key={item.id}
                       onClick={() => setActiveSection(item.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                        activeSection === item.id
+                      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${activeSection === item.id
                           ? 'bg-primary/5 text-primary border-r-4 border-primary'
                           : 'hover:bg-muted text-muted-foreground hover:text-foreground'
-                      }`}
+                        }`}
                     >
                       <Icon size={20} />
                       {item.label}
@@ -358,7 +384,10 @@ const Account = () => {
                   );
                 })}
                 <div className="border-t border-border my-2" />
-                <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted text-destructive transition-colors">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted text-destructive transition-colors"
+                >
                   <LogOut size={20} />
                   Logout
                 </button>

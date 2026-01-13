@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Filter, Grid, List, ChevronDown, X } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
-import { products, categories } from '@/data/products';
+import { fetchProducts } from '@/api/client';
+import { categories } from '@/data/products';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -17,6 +19,7 @@ import {
 
 const Search = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.get('q') || '';
   const categoryParam = searchParams.get('category') || '';
 
@@ -27,65 +30,56 @@ const Search = () => {
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Fetch products from API
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products', categoryParam, query],
+    queryFn: () => fetchProducts(categoryParam, query),
+  });
+
   // Get unique brands
   const brands = useMemo(() => {
-    return [...new Set(products.map(p => p.seller))];
-  }, []);
+    return [...new Set(products.map((p: any) => p.seller))];
+  }, [products]);
 
   // Filter products
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Search query filter
-    if (query) {
-      const searchLower = query.toLowerCase();
-      result = result.filter(p =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.category.toLowerCase().includes(searchLower) ||
-        p.description.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Category filter
-    if (categoryParam) {
-      result = result.filter(p => p.category === categoryParam || p.subCategory === categoryParam);
-    }
-
     // Price range filter
-    result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    result = result.filter((p: any) => p.price >= priceRange[0] && p.price <= priceRange[1]);
 
     // Brand filter
     if (selectedBrands.length > 0) {
-      result = result.filter(p => selectedBrands.includes(p.seller));
+      result = result.filter((p: any) => selectedBrands.includes(p.seller));
     }
 
     // Rating filter
     if (selectedRatings.length > 0) {
       const minRating = Math.min(...selectedRatings);
-      result = result.filter(p => p.rating >= minRating);
+      result = result.filter((p: any) => p.rating >= minRating);
     }
 
     // Sorting
     switch (sortBy) {
       case 'price-low':
-        result.sort((a, b) => a.price - b.price);
+        result.sort((a: any, b: any) => a.price - b.price);
         break;
       case 'price-high':
-        result.sort((a, b) => b.price - a.price);
+        result.sort((a: any, b: any) => b.price - a.price);
         break;
       case 'rating':
-        result.sort((a, b) => b.rating - a.rating);
+        result.sort((a: any, b: any) => b.rating - a.rating);
         break;
       case 'newest':
-        result.sort((a, b) => b.id.localeCompare(a.id));
+        result.sort((a: any, b: any) => (b.id || '').localeCompare(a.id || ''));
         break;
       case 'discount':
-        result.sort((a, b) => b.discountPercentage - a.discountPercentage);
+        result.sort((a: any, b: any) => b.discountPercentage - a.discountPercentage);
         break;
     }
 
     return result;
-  }, [query, categoryParam, priceRange, selectedBrands, selectedRatings, sortBy]);
+  }, [products, priceRange, selectedBrands, selectedRatings, sortBy]);
 
   const toggleBrand = (brand: string) => {
     setSelectedBrands(prev =>
@@ -112,6 +106,18 @@ const Search = () => {
   const hasActiveFilters = selectedBrands.length > 0 || selectedRatings.length > 0 || priceRange[0] > 0 || priceRange[1] < 200000;
 
   const currentCategory = categories.find(c => c.id === categoryParam);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-20 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,10 +164,16 @@ const Search = () => {
                 </h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {categories.slice(0, 8).map(cat => (
-                    <label key={cat.id} className="filter-checkbox">
+                    <label key={cat.id} className="filter-checkbox cursor-pointer">
                       <Checkbox
                         checked={categoryParam === cat.id}
-                        onCheckedChange={() => {}}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            navigate(`/search?category=${cat.id}`);
+                          } else {
+                            navigate('/search');
+                          }
+                        }}
                       />
                       <span>{cat.name}</span>
                     </label>
@@ -190,7 +202,7 @@ const Search = () => {
               <div className="filter-section">
                 <h4 className="font-medium mb-3">Brands</h4>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {brands.slice(0, 10).map(brand => (
+                  {brands.slice(0, 10).map((brand: any) => (
                     <label key={brand} className="filter-checkbox">
                       <Checkbox
                         checked={selectedBrands.includes(brand)}
@@ -228,7 +240,7 @@ const Search = () => {
                 <span className="text-sm text-muted-foreground">
                   Showing <strong>{filteredProducts.length}</strong> results
                 </span>
-                
+
                 {/* Mobile Filter Button */}
                 <button
                   onClick={() => setShowFilters(true)}
@@ -279,7 +291,7 @@ const Search = () => {
                   ? 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4'
                   : 'flex flex-col gap-4'
               }>
-                {filteredProducts.map(product => (
+                {filteredProducts.map((product: any) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -315,7 +327,7 @@ const Search = () => {
               </button>
             </div>
             <div className="p-4">
-              {/* Same filter content as desktop */}
+              {/* Price Range */}
               <div className="filter-section">
                 <h4 className="font-medium mb-3">Price Range</h4>
                 <Slider
@@ -332,10 +344,11 @@ const Search = () => {
                 </div>
               </div>
 
+              {/* Brands */}
               <div className="filter-section">
                 <h4 className="font-medium mb-3">Brands</h4>
                 <div className="space-y-2">
-                  {brands.slice(0, 10).map(brand => (
+                  {brands.slice(0, 10).map((brand: any) => (
                     <label key={brand} className="filter-checkbox">
                       <Checkbox
                         checked={selectedBrands.includes(brand)}
@@ -347,6 +360,7 @@ const Search = () => {
                 </div>
               </div>
 
+              {/* Rating */}
               <div className="filter-section border-b-0">
                 <h4 className="font-medium mb-3">Rating</h4>
                 <div className="space-y-2">

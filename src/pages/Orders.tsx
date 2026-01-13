@@ -1,55 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Search, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronRight, Search, Package, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Input } from '@/components/ui/input';
-import { products } from '@/data/products';
+import { useAuth } from '@/context/AuthContext';
+import { fetchMyOrders, cancelOrderAPI } from '@/api/client';
+import { toast } from 'sonner';
 
-// Mock orders data
-const mockOrders = [
-  {
-    id: 'FK1736547890',
-    date: '2024-01-10',
-    status: 'delivered',
-    total: 156900,
-    items: [
-      { product: products[0], quantity: 1 },
-    ],
-  },
-  {
-    id: 'FK1736123456',
-    date: '2024-01-08',
-    status: 'processing',
-    total: 26990,
-    items: [
-      { product: products[2], quantity: 1 },
-    ],
-  },
-  {
-    id: 'FK1735987654',
-    date: '2024-01-05',
-    status: 'shipped',
-    total: 19494,
-    items: [
-      { product: products[5], quantity: 2 },
-      { product: products[9], quantity: 1 },
-    ],
-  },
-  {
-    id: 'FK1735654321',
-    date: '2024-01-01',
-    status: 'cancelled',
-    total: 42990,
-    items: [
-      { product: products[6], quantity: 1 },
-    ],
-  },
-];
+interface OrderItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
 
-const statusConfig = {
-  processing: {
-    label: 'Processing',
+interface Order {
+  _id: string;
+  items: OrderItem[];
+  totalAmount: number;
+  orderStatus: string;
+  paymentMethod: string;
+  createdAt: string;
+}
+
+const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
+  placed: {
+    label: 'Placed',
+    color: 'text-blue-600 bg-blue-50',
+    icon: Clock,
+  },
+  confirmed: {
+    label: 'Confirmed',
     color: 'text-blue-600 bg-blue-50',
     icon: Package,
   },
@@ -71,8 +54,41 @@ const statusConfig = {
 };
 
 const Orders = () => {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+      try {
+        const data = await fetchMyOrders();
+        setOrders(data);
+      } catch (error) {
+        console.error('Failed to load orders:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadOrders();
+  }, [user]);
+
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      await cancelOrderAPI(orderId);
+      setOrders(orders.map(o =>
+        o._id === orderId ? { ...o, orderStatus: 'cancelled' } : o
+      ));
+      toast.success('Order cancelled successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to cancel order');
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -90,12 +106,39 @@ const Orders = () => {
     });
   };
 
-  const filteredOrders = mockOrders.filter((order) => {
-    const matchesSearch = order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some(item => item.product.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch = order._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStatus = filterStatus === 'all' || order.orderStatus === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold mb-4">Please Login to View Orders</h1>
+          <Link to="/login" className="btn-flipkart-primary">
+            Login
+          </Link>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-20 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,17 +168,16 @@ const Orders = () => {
             />
           </div>
           <div className="flex gap-2 overflow-x-auto">
-            {['all', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+            {['all', 'placed', 'confirmed', 'shipped', 'delivered', 'cancelled'].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilterStatus(status)}
-                className={`px-4 py-2 rounded-sm text-sm font-medium whitespace-nowrap transition-colors ${
-                  filterStatus === status
+                className={`px-4 py-2 rounded-sm text-sm font-medium whitespace-nowrap transition-colors ${filterStatus === status
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted hover:bg-muted/80'
-                }`}
+                  }`}
               >
-                {status === 'all' ? 'All Orders' : statusConfig[status as keyof typeof statusConfig].label}
+                {status === 'all' ? 'All Orders' : statusConfig[status]?.label || status}
               </button>
             ))}
           </div>
@@ -145,30 +187,29 @@ const Orders = () => {
         {filteredOrders.length > 0 ? (
           <div className="space-y-4">
             {filteredOrders.map((order) => {
-              const StatusIcon = statusConfig[order.status as keyof typeof statusConfig].icon;
+              const config = statusConfig[order.orderStatus] || statusConfig.placed;
+              const StatusIcon = config.icon;
               return (
-                <div key={order.id} className="bg-card rounded-sm overflow-hidden">
+                <div key={order._id} className="bg-card rounded-sm overflow-hidden">
                   {/* Order Header */}
                   <div className="p-4 border-b border-border flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-6">
                       <div>
                         <p className="text-sm text-muted-foreground">Order ID</p>
-                        <p className="font-mono font-medium">#{order.id}</p>
+                        <p className="font-mono font-medium text-sm">#{order._id.slice(-8).toUpperCase()}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Ordered on</p>
-                        <p className="font-medium">{formatDate(order.date)}</p>
+                        <p className="font-medium">{formatDate(order.createdAt)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Total</p>
-                        <p className="font-medium">{formatPrice(order.total)}</p>
+                        <p className="font-medium">{formatPrice(order.totalAmount)}</p>
                       </div>
                     </div>
-                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-                      statusConfig[order.status as keyof typeof statusConfig].color
-                    }`}>
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
                       <StatusIcon size={16} />
-                      {statusConfig[order.status as keyof typeof statusConfig].label}
+                      {config.label}
                     </span>
                   </div>
 
@@ -176,36 +217,20 @@ const Orders = () => {
                   <div className="divide-y divide-border">
                     {order.items.map((item, index) => (
                       <div key={index} className="p-4 flex gap-4">
-                        <Link to={`/product/${item.product.id}`} className="w-20 h-20 flex-shrink-0">
+                        <div className="w-20 h-20 flex-shrink-0">
                           <img
-                            src={item.product.images[0]}
-                            alt={item.product.name}
+                            src={item.image}
+                            alt={item.name}
                             className="w-full h-full object-cover rounded-sm"
                           />
-                        </Link>
-                        <div className="flex-1 min-w-0">
-                          <Link
-                            to={`/product/${item.product.id}`}
-                            className="font-medium text-foreground hover:text-primary line-clamp-2"
-                          >
-                            {item.product.name}
-                          </Link>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Qty: {item.quantity} × {formatPrice(item.product.price)}
-                          </p>
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <Link
-                            to={`/product/${item.product.id}`}
-                            className="text-sm text-primary hover:underline"
-                          >
-                            View Product
-                          </Link>
-                          {order.status === 'delivered' && (
-                            <button className="text-sm text-primary hover:underline">
-                              Write Review
-                            </button>
-                          )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground line-clamp-2">
+                            {item.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Qty: {item.quantity} × {formatPrice(item.price)}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -214,29 +239,19 @@ const Orders = () => {
                   {/* Order Actions */}
                   <div className="p-4 border-t border-border bg-muted/50 flex flex-wrap gap-4">
                     <Link
-                      to={`/order-confirmation/${order.id}`}
+                      to={`/order-confirmation/${order._id}`}
                       className="text-sm text-primary hover:underline"
                     >
                       View Order Details
                     </Link>
-                    {order.status === 'delivered' && (
-                      <>
-                        <button className="text-sm text-primary hover:underline">
-                          Download Invoice
-                        </button>
-                        <button className="text-sm text-primary hover:underline">
-                          Return / Replace
-                        </button>
-                      </>
-                    )}
-                    {(order.status === 'processing' || order.status === 'shipped') && (
-                      <button className="text-sm text-primary hover:underline">
-                        Track Order
+                    {['placed', 'confirmed'].includes(order.orderStatus) && (
+                      <button
+                        onClick={() => handleCancelOrder(order._id)}
+                        className="text-sm text-destructive hover:underline"
+                      >
+                        Cancel Order
                       </button>
                     )}
-                    <button className="text-sm text-primary hover:underline">
-                      Need Help?
-                    </button>
                   </div>
                 </div>
               );

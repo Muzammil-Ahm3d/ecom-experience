@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, ChevronDown, User, Menu, X, Heart, Package, HelpCircle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+
 import { useCart } from '@/context/CartContext';
 import {
   DropdownMenu,
@@ -14,6 +16,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { totalItems } = useCart();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -21,6 +24,11 @@ const Header = () => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   return (
@@ -57,34 +65,42 @@ const Header = () => {
           </form>
 
           {/* Login Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-primary-foreground hover:text-primary-foreground/80">
-              <User size={20} />
-              <span className="font-medium">Login</span>
-              <ChevronDown size={16} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link to="/account" className="flex items-center gap-2">
-                  <User size={16} /> My Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/orders" className="flex items-center gap-2">
-                  <Package size={16} /> Orders
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/wishlist" className="flex items-center gap-2">
-                  <Heart size={16} /> Wishlist
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 px-4 py-2 text-primary-foreground hover:text-primary-foreground/80">
+                <User size={20} />
+                <span className="font-medium">{user.name}</span>
+                <ChevronDown size={16} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/account" className="flex items-center gap-2">
+                    <User size={16} /> My Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/orders" className="flex items-center gap-2">
+                    <Package size={16} /> Orders
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wishlist" className="flex items-center gap-2">
+                    <Heart size={16} /> Wishlist
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <button className="bg-white text-primary font-medium px-8 py-1 rounded-sm hover:bg-white/90">
+                Login
+              </button>
+            </Link>
+          )}
 
           {/* Become a Seller */}
           <Link to="/seller" className="text-primary-foreground hover:text-primary-foreground/80 font-medium">
@@ -116,11 +132,11 @@ const Header = () => {
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X size={24} className="text-primary-foreground" /> : <Menu size={24} className="text-primary-foreground" />}
           </button>
-          
+
           <Link to="/" className="text-xl font-bold italic text-primary-foreground">
             Flipkart
           </Link>
-          
+
           <Link to="/cart" className="relative text-primary-foreground">
             <ShoppingCart size={22} />
             {totalItems > 0 && (

@@ -1,4 +1,7 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useAuth } from './AuthContext';
+import { fetchCart, addToCartAPI, updateCartItemAPI, removeFromCartAPI, clearCartAPI } from '@/api/client';
+import { toast } from 'sonner';
 
 export interface CartItem {
   id: string;
@@ -23,41 +26,134 @@ interface CartContextType {
   subtotal: number;
   discount: number;
   total: number;
+  isLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Helper to transform backend cart to frontend format
+const transformCartItems = (backendCart: any): CartItem[] => {
+  if (!backendCart?.items) return [];
+
+  return backendCart.items.map((item: any) => {
+    const product = item.productId;
+    if (!product) return null;
+
+    return {
+      id: product._id || product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice || product.price,
+      image: product.images?.[0] || product.image,
+      quantity: item.quantity,
+      variant: item.variant,
+    };
+  }).filter(Boolean);
+};
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
-  const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => 
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
+  // Fetch cart on login
+  useEffect(() => {
+    const loadCart = async () => {
+      if (user) {
+        setIsLoading(true);
+        try {
+          const cart = await fetchCart();
+          setItems(transformCartItems(cart));
+        } catch (error) {
+          console.error('Failed to load cart:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // Clear cart when logged out
+        setItems([]);
       }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  }, []);
+    };
 
-  const removeFromCart = useCallback((id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-  }, []);
+    loadCart();
+  }, [user]);
 
-  const updateQuantity = useCallback((id: string, quantity: number) => {
+  const addToCart = useCallback(async (item: Omit<CartItem, 'quantity'>) => {
+    if (!user) {
+      // Guest user - local only (Phase 3B will handle this)
+      setItems(prev => {
+        const existing = prev.find(i => i.id === item.id);
+        if (existing) {
+          return prev.map(i =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          );
+        }
+        return [...prev, { ...item, quantity: 1 }];
+      });
+      toast.info('Login to save your cart!');
+      return;
+    }
+
+    try {
+      const updatedCart = await addToCartAPI(item.id, 1, item.variant);
+      setItems(transformCartItems(updatedCart));
+      toast.success('Added to cart!');
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      toast.error('Failed to add item');
+    }
+  }, [user]);
+
+  const removeFromCart = useCallback(async (id: string) => {
+    if (!user) {
+      setItems(prev => prev.filter(item => item.id !== id));
+      return;
+    }
+
+    try {
+      const updatedCart = await removeFromCartAPI(id);
+      setItems(transformCartItems(updatedCart));
+    } catch (error) {
+      console.error('Failed to remove from cart:', error);
+      toast.error('Failed to remove item');
+    }
+  }, [user]);
+
+  const updateQuantity = useCallback(async (id: string, quantity: number) => {
     if (quantity < 1) return;
-    setItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  }, []);
 
-  const clearCart = useCallback(() => {
-    setItems([]);
-  }, []);
+    if (!user) {
+      setItems(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+      return;
+    }
+
+    try {
+      const updatedCart = await updateCartItemAPI(id, quantity);
+      setItems(transformCartItems(updatedCart));
+    } catch (error) {
+      console.error('Failed to update quantity:', error);
+      toast.error('Failed to update quantity');
+    }
+  }, [user]);
+
+  const clearCart = useCallback(async () => {
+    if (!user) {
+      setItems([]);
+      return;
+    }
+
+    try {
+      await clearCartAPI();
+      setItems([]);
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+      toast.error('Failed to clear cart');
+    }
+  }, [user]);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
@@ -75,6 +171,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subtotal,
       discount,
       total,
+      isLoading,
     }}>
       {children}
     </CartContext.Provider>
