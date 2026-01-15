@@ -11,13 +11,18 @@ const api = axios.create({
 });
 
 export const fetchProducts = async (category?: string, search?: string, sale?: string) => {
-    const params: any = {};
-    if (category) params.category = category;
-    if (search) params.search = search;
-    if (sale) params.sale = sale;
+    try {
+        const params: any = {};
+        if (category) params.category = category;
+        if (search) params.search = search;
+        if (sale) params.sale = sale;
 
-    const response = await api.get('/products', { params });
-    return response.data;
+        const response = await api.get('/products', { params });
+        return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+        console.error('Failed to fetch products:', error);
+        return [];
+    }
 };
 
 export const fetchProductById = async (id: string) => {
