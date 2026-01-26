@@ -27,6 +27,23 @@ const Index = () => {
     );
   }
 
+  if (!allProducts.length && !isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-center">
+        <h2 className="text-xl font-bold mb-2">Unable to load products</h2>
+        <p className="text-muted-foreground mb-4">
+          We're having trouble connecting to our server. Please try again later.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="btn-hascart-primary"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />

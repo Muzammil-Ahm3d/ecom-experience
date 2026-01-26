@@ -10,6 +10,8 @@ const api = axios.create({
     },
 });
 
+console.log('🚀 API Client Initialized with Base URL:', API_BASE_URL);
+
 export const fetchProducts = async (category?: string, search?: string, sale?: string) => {
     try {
         const params: any = {};
