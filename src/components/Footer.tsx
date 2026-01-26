@@ -14,7 +14,7 @@ const Footer = () => {
               <li><Link to="/about" className="text-sm text-gray-300 hover:underline">Contact Us</Link></li>
               <li><Link to="/about" className="text-sm text-gray-300 hover:underline">About Us</Link></li>
               <li><Link to="/careers" className="text-sm text-gray-300 hover:underline">Careers</Link></li>
-              <li><Link to="/stories" className="text-sm text-gray-300 hover:underline">Flipkart Stories</Link></li>
+              <li><Link to="/stories" className="text-sm text-gray-300 hover:underline">Hascart Stories</Link></li>
               <li><Link to="/press" className="text-sm text-gray-300 hover:underline">Press</Link></li>
             </ul>
           </div>
@@ -58,7 +58,7 @@ const Footer = () => {
           <div className="col-span-2 md:col-span-1 lg:col-span-2">
             <h4 className="text-xs text-gray-400 font-medium mb-4 uppercase tracking-wider">Mail Us</h4>
             <p className="text-xs text-gray-300 leading-relaxed">
-              Flipkart Internet Private Limited,<br />
+              Hascart Internet Private Limited,<br />
               Buildings Alyssa, Begonia &<br />
               Clove Embassy Tech Village,<br />
               Outer Ring Road, Devarabeesanahalli Village,<br />
@@ -86,7 +86,7 @@ const Footer = () => {
 
             {/* Copyright */}
             <p className="text-xs text-gray-400">
-              © 2024 Flipkart Clone. All rights reserved.
+              © 2024 Hascart. All rights reserved.
             </p>
           </div>
         </div>

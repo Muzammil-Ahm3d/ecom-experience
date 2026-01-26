@@ -35,7 +35,7 @@ const Cart = () => {
             <p className="text-muted-foreground mb-6">
               Looks like you haven't added anything to your cart yet.
             </p>
-            <Link to="/" className="btn-flipkart-primary inline-block">
+            <Link to="/" className="btn-hascart-primary inline-block">
               Continue Shopping
             </Link>
           </div>
@@ -95,7 +95,7 @@ const Cart = () => {
                       )}
 
                       <p className="text-sm text-muted-foreground mt-1">
-                        Seller: Flipkart
+                        Seller: Hascart
                       </p>
 
                       <div className="flex items-center gap-3 mt-2">
@@ -149,7 +149,7 @@ const Cart = () => {
 
               {/* Place Order Button - Mobile */}
               <div className="lg:hidden p-4 border-t border-border">
-                <Link to="/checkout" className="btn-flipkart-secondary w-full py-4 text-center block">
+                <Link to="/checkout" className="btn-hascart-secondary w-full py-4 text-center block">
                   Place Order
                 </Link>
               </div>
@@ -203,7 +203,7 @@ const Cart = () => {
 
               {/* Place Order Button - Desktop */}
               <div className="hidden lg:block p-4 border-t border-border">
-                <Link to="/checkout" className="btn-flipkart-secondary w-full py-4 text-center block text-lg">
+                <Link to="/checkout" className="btn-hascart-secondary w-full py-4 text-center block text-lg">
                   Place Order
                 </Link>
               </div>

@@ -166,7 +166,7 @@ const Account = () => {
               {isEditing && (
                 <button
                   onClick={handleSaveProfile}
-                  className="btn-flipkart-primary"
+                  className="btn-hascart-primary"
                 >
                   Save Changes
                 </button>
@@ -180,7 +180,7 @@ const Account = () => {
           <div className="bg-card rounded-sm p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold">Manage Addresses</h2>
-              <button className="btn-flipkart-primary text-sm flex items-center gap-1">
+              <button className="btn-hascart-primary text-sm flex items-center gap-1">
                 <Plus size={16} /> Add New Address
               </button>
             </div>
@@ -239,7 +239,7 @@ const Account = () => {
               <p className="text-muted-foreground mb-4">
                 Save items you like by clicking the heart icon
               </p>
-              <Link to="/" className="btn-flipkart-primary">
+              <Link to="/" className="btn-hascart-primary">
                 Start Shopping
               </Link>
             </div>
@@ -256,7 +256,7 @@ const Account = () => {
               <p className="text-muted-foreground mb-4">
                 Add a card for faster checkout
               </p>
-              <button className="btn-flipkart-primary">
+              <button className="btn-hascart-primary">
                 Add New Card
               </button>
             </div>
@@ -374,8 +374,8 @@ const Account = () => {
                       key={item.id}
                       onClick={() => setActiveSection(item.id)}
                       className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${activeSection === item.id
-                          ? 'bg-primary/5 text-primary border-r-4 border-primary'
-                          : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                        ? 'bg-primary/5 text-primary border-r-4 border-primary'
+                        : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                         }`}
                     >
                       <Icon size={20} />

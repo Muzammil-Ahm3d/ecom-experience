@@ -49,7 +49,7 @@ const ProductSection = ({
           {viewAllLink && (
             <Link
               to={viewAllLink}
-              className="btn-flipkart-primary text-sm flex items-center gap-1"
+              className="btn-hascart-primary text-sm flex items-center gap-1"
             >
               View All <ChevronRight size={16} />
             </Link>

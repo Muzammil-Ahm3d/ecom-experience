@@ -46,7 +46,7 @@ const BannerCarousel = () => {
                   <p className="text-lg md:text-xl text-white/90">
                     {banner.subtitle}
                   </p>
-                  <button className="mt-4 btn-flipkart-secondary">
+                  <button className="mt-4 btn-hascart-secondary">
                     Shop Now
                   </button>
                 </div>
@@ -76,9 +76,8 @@ const BannerCarousel = () => {
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
-            }`}
+            className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white/50'
+              }`}
           />
         ))}
       </div>

@@ -306,7 +306,7 @@ const Search = () => {
                 <p className="text-muted-foreground mb-4">
                   Try different filters or search for something else
                 </p>
-                <button onClick={clearFilters} className="btn-flipkart-primary">
+                <button onClick={clearFilters} className="btn-hascart-primary">
                   Clear Filters
                 </button>
               </div>
@@ -385,7 +385,7 @@ const Search = () => {
               </button>
               <button
                 onClick={() => setShowFilters(false)}
-                className="flex-1 btn-flipkart-secondary"
+                className="flex-1 btn-hascart-secondary"
               >
                 Apply
               </button>

@@ -75,7 +75,7 @@ const ProductCard = ({ product, layout = 'grid' }: ProductCardProps) => {
         <div className="flex flex-col gap-2">
           <button
             onClick={handleAddToCart}
-            className="btn-flipkart-primary text-sm"
+            className="btn-hascart-primary text-sm"
           >
             Add to Cart
           </button>
@@ -116,12 +116,12 @@ const ProductCard = ({ product, layout = 'grid' }: ProductCardProps) => {
           <Heart size={18} className="text-muted-foreground hover:text-destructive transition-colors" />
         </button>
       </div>
-      
+
       <div className="p-4">
         <h3 className="font-medium text-sm text-foreground line-clamp-2 min-h-[40px] mb-2">
           {product.name}
         </h3>
-        
+
         <div className="flex items-center gap-2 mb-2">
           <span className="rating-badge">
             {product.rating} <Star size={10} fill="currentColor" />
@@ -139,7 +139,7 @@ const ProductCard = ({ product, layout = 'grid' }: ProductCardProps) => {
 
         <button
           onClick={handleAddToCart}
-          className="w-full mt-3 btn-flipkart-primary text-sm py-2"
+          className="w-full mt-3 btn-hascart-primary text-sm py-2"
         >
           Add to Cart
         </button>

@@ -89,12 +89,12 @@ const Index = () => {
           <div className="bg-gradient-to-r from-primary to-primary/80 rounded-lg p-8 md:p-12 text-primary-foreground">
             <div className="max-w-2xl">
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                Become a Flipkart Seller
+                Become a Hascart Seller
               </h2>
               <p className="text-primary-foreground/90 mb-6">
-                Sell online to 50 Cr+ customers at 0% commission. Grow your business with Flipkart!
+                Sell online to 50 Cr+ customers at 0% commission. Grow your business with Hascart!
               </p>
-              <button className="btn-flipkart-secondary">
+              <button className="btn-hascart-secondary">
                 Start Selling
               </button>
             </div>

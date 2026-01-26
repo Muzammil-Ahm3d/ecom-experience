@@ -37,7 +37,7 @@ const ProductDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <Link to="/" className="btn-flipkart-primary">
+          <Link to="/" className="btn-hascart-primary">
             Back to Home
           </Link>
         </div>
@@ -155,10 +155,10 @@ const ProductDetail = () => {
 
             {/* Action Buttons - Mobile */}
             <div className="lg:hidden flex gap-3 mt-4">
-              <button onClick={handleAddToCart} className="flex-1 btn-flipkart-primary py-4">
+              <button onClick={handleAddToCart} className="flex-1 btn-hascart-primary py-4">
                 Add to Cart
               </button>
-              <button onClick={handleBuyNow} className="flex-1 btn-flipkart-secondary py-4">
+              <button onClick={handleBuyNow} className="flex-1 btn-hascart-secondary py-4">
                 Buy Now
               </button>
             </div>
@@ -237,8 +237,8 @@ const ProductDetail = () => {
                           key={option}
                           onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: option }))}
                           className={`px-4 py-2 border rounded-sm text-sm font-medium transition-colors ${selectedVariants[variant.name] === option
-                              ? 'border-primary bg-primary/5 text-primary'
-                              : 'border-border hover:border-primary/50'
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border hover:border-primary/50'
                             }`}
                         >
                           {option}
@@ -306,10 +306,10 @@ const ProductDetail = () => {
 
             {/* Action Buttons - Desktop */}
             <div className="hidden lg:flex gap-4">
-              <button onClick={handleAddToCart} className="flex-1 btn-flipkart-primary py-4 text-lg">
+              <button onClick={handleAddToCart} className="flex-1 btn-hascart-primary py-4 text-lg">
                 Add to Cart
               </button>
-              <button onClick={handleBuyNow} className="flex-1 btn-flipkart-secondary py-4 text-lg">
+              <button onClick={handleBuyNow} className="flex-1 btn-hascart-secondary py-4 text-lg">
                 Buy Now
               </button>
             </div>
@@ -343,7 +343,7 @@ const ProductDetail = () => {
         <section className="bg-card rounded-sm p-6 mt-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold">Ratings & Reviews</h2>
-            <button className="btn-flipkart-primary text-sm">
+            <button className="btn-hascart-primary text-sm">
               Rate Product
             </button>
           </div>

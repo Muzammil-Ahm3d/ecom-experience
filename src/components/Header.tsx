@@ -32,16 +32,15 @@ const Header = () => {
   };
 
   return (
-    <header className="flipkart-header">
+    <header className="hascart-header">
       <div className="container mx-auto">
         {/* Desktop Header */}
         <div className="hidden md:flex items-center gap-4 h-16 px-4">
           {/* Logo */}
           <Link to="/" className="flex flex-col items-start">
-            <span className="text-xl font-bold italic text-primary-foreground">Flipkart</span>
+            <span className="text-xl font-bold italic text-primary-foreground">Hascart</span>
             <span className="text-[10px] text-primary-foreground/80 flex items-center gap-1">
               Explore <span className="text-secondary">Plus</span>
-              <img src="https://static-assets-web.flixcart.com/batman-returns/batman-returns/p/images/header-img-b1da93.svg" alt="" className="h-3" />
             </span>
           </Link>
 
@@ -53,7 +52,7 @@ const Header = () => {
                 placeholder="Search for products, brands and more"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flipkart-search w-full h-9 pr-12"
+                className="hascart-search w-full h-9 pr-12"
               />
               <button
                 type="submit"
@@ -134,7 +133,7 @@ const Header = () => {
           </button>
 
           <Link to="/" className="text-xl font-bold italic text-primary-foreground">
-            Flipkart
+            Hascart
           </Link>
 
           <Link to="/cart" className="relative text-primary-foreground">
@@ -156,7 +155,7 @@ const Header = () => {
                 placeholder="Search for products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="flipkart-search w-full h-10 pr-12"
+                className="hascart-search w-full h-10 pr-12"
               />
               <button
                 type="submit"

@@ -51,9 +51,9 @@ const Login = () => {
                             </p>
                         </div>
                         <img
-                            src="https://static-assets-web.flixcart.com/fk-p-linchpin-web/fk-cp-zion/img/login_img_c4a81e.png"
+                            src="/hascart_logo.png"
                             alt="Login"
-                            className="mt-auto"
+                            className="mt-auto w-32 mx-auto"
                         />
                     </div>
 
@@ -118,7 +118,7 @@ const Login = () => {
                             </div>
 
                             <p className="text-xs text-gray-500">
-                                By continuing, you agree to Flipkart's <span className="text-primary">Terms of Use</span> and <span className="text-primary">Privacy Policy</span>.
+                                By continuing, you agree to Hascart's <span className="text-primary">Terms of Use</span> and <span className="text-primary">Privacy Policy</span>.
                             </p>
 
                             <button
@@ -136,7 +136,7 @@ const Login = () => {
                                         onClick={() => setIsLogin(false)}
                                         className="text-primary font-medium text-sm"
                                     >
-                                        New to Flipkart? Create an account
+                                        New to Hascart? Create an account
                                     </button>
                                 </div>
                             )}

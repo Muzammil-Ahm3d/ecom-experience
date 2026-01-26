@@ -69,7 +69,7 @@ const Checkout = () => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Please Login to Checkout</h1>
-          <Link to="/login" className="btn-flipkart-primary">
+          <Link to="/login" className="btn-hascart-primary">
             Login
           </Link>
         </div>
@@ -84,7 +84,7 @@ const Checkout = () => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Your Cart is Empty</h1>
-          <Link to="/" className="btn-flipkart-primary">
+          <Link to="/" className="btn-hascart-primary">
             Continue Shopping
           </Link>
         </div>
@@ -270,7 +270,7 @@ const Checkout = () => {
               <button
                 onClick={handlePlaceOrder}
                 disabled={isLoading || !isAddressValid()}
-                className="w-full btn-flipkart-secondary py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full btn-hascart-secondary py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Placing Order...' : 'Place Order'}
               </button>

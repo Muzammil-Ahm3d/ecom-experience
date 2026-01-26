@@ -119,7 +119,7 @@ const Orders = () => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Please Login to View Orders</h1>
-          <Link to="/login" className="btn-flipkart-primary">
+          <Link to="/login" className="btn-hascart-primary">
             Login
           </Link>
         </div>
@@ -173,8 +173,8 @@ const Orders = () => {
                 key={status}
                 onClick={() => setFilterStatus(status)}
                 className={`px-4 py-2 rounded-sm text-sm font-medium whitespace-nowrap transition-colors ${filterStatus === status
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted hover:bg-muted/80'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted hover:bg-muted/80'
                   }`}
               >
                 {status === 'all' ? 'All Orders' : statusConfig[status]?.label || status}
@@ -266,7 +266,7 @@ const Orders = () => {
                 ? 'Try adjusting your search or filters'
                 : "You haven't placed any orders yet"}
             </p>
-            <Link to="/" className="btn-flipkart-primary">
+            <Link to="/" className="btn-hascart-primary">
               Start Shopping
             </Link>
           </div>

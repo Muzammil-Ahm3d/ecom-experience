@@ -77,7 +77,7 @@ const OrderConfirmation = () => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
-          <Link to="/" className="btn-flipkart-primary">
+          <Link to="/" className="btn-hascart-primary">
             Go Home
           </Link>
         </div>
@@ -166,7 +166,7 @@ const OrderConfirmation = () => {
             </div>
 
             <div className="flex gap-4">
-              <Link to="/orders" className="flex-1 btn-flipkart-primary text-center py-3">
+              <Link to="/orders" className="flex-1 btn-hascart-primary text-center py-3">
                 View All Orders
               </Link>
               <Link to="/" className="flex-1 border border-primary text-primary hover:bg-primary/5 rounded-sm text-center py-3 transition-colors">
