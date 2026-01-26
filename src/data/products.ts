@@ -404,8 +404,8 @@ export const products: Product[] = [
 export const banners = [
   {
     id: '1',
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=400&fit=crop',
-    title: 'Big Billion Days Sale',
+    image: '/mega_sale_banner.png',
+    title: 'Hascart Mega Sale',
     subtitle: 'Up to 80% Off on Electronics',
     link: '/search?category=electronics',
   },
