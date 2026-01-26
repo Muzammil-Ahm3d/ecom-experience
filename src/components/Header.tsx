@@ -169,7 +169,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-card border-t border-border animate-slide-in">
+          <div className="md:hidden bg-card text-foreground border-t border-border animate-slide-in">
             <nav className="py-2">
               <Link to="/account" className="flex items-center gap-3 px-4 py-3 hover:bg-muted" onClick={() => setMobileMenuOpen(false)}>
                 <User size={20} /> My Profile
